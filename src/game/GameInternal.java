@@ -1,6 +1,8 @@
 package game;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +13,7 @@ import bwapi.Game;
 import bwapi.Unit;
 import bwapi.UnitType;
 import command.RegisterCommandCenter;
+import models.ReservedResources;
 import strategy.Desire;
 import strategy.WorkerMining;
 
@@ -55,15 +58,32 @@ public class GameInternal {
 				if (oldDesire != null && !oldDesire.equals(maxDesire)) {
 					oldDesire.removeUnit(unit);
 				}
-				
-				
 			}
 		}
 	}
-	
-	public void updateBuildDesires(Game game){
-		for (BuildDesire desire : buildDesires){
-			desire.desire(game);
+
+	public void updateBuildDesires(Game game) {
+		ReservedResources myReservedSources = new ReservedResources();
+		List<ReservedResources> resources = new ArrayList<>();
+		for (BuildDesire desire : buildDesires) {
+			resources.add(desire.desire(game));
+		}
+
+		Collections.sort(resources, new Comparator<ReservedResources>() {
+			@Override
+			public int compare(ReservedResources o1, ReservedResources o2) {
+				return o2.getPoints() - o1.getPoints();
+			}
+		});
+
+		List<ReservedResources> whatWeBuild = new ArrayList<>();
+		for (ReservedResources resource : resources) {
+			if (myReservedSources.canReserve(resource, new ReservedResources(game.self().minerals(), game.self().gas(),
+					game.self().supplyTotal() - game.self().supplyUsed(), 0))) {
+				
+				myReservedSources.add(resource);
+				whatWeBuild.add(resource);
+			}
 		}
 	}
 
@@ -80,13 +100,13 @@ public class GameInternal {
 			desire.removeUnit(unit);
 		}
 	}
-	
-	public void writeStrategies(Game game){
-		for (Map.Entry<Unit, Desire> entry : unitsInDesires.entrySet()){
+
+	public void writeStrategies(Game game) {
+		for (Map.Entry<Unit, Desire> entry : unitsInDesires.entrySet()) {
 			game.drawTextMap(entry.getKey().getPosition(), entry.getValue().infoText());
 		}
-		
-		for (Desire desire : desires){
+
+		for (Desire desire : desires) {
 			desire.specialStrategies(game);
 		}
 	}
