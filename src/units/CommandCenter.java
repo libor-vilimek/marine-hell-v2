@@ -3,6 +3,8 @@ package units;
 import java.util.ArrayList;
 import java.util.List;
 
+import bwapi.Color;
+import bwapi.Game;
 import bwapi.Unit;
 
 public class CommandCenter extends UnitInternal {
@@ -29,5 +31,9 @@ public class CommandCenter extends UnitInternal {
 	
 	public void removeWorker(Unit unit){
 		workers.remove(unit);
+	}
+	
+	public void writeStrategies(Game game){
+		game.drawLineMap(this.getUnit().getPosition(), this.closestMineralField.getPosition(), Color.Black);
 	}
 }

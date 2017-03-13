@@ -2,6 +2,7 @@ package strategy;
 
 import java.util.List;
 
+import bwapi.Game;
 import bwapi.Unit;
 import units.UnitInternal;
 
@@ -11,4 +12,5 @@ public interface Desire {
 	public void execute();
 	public void removeUnit(Unit unit);
 	public String infoText();
+	public void specialStrategies(Game game);
 }

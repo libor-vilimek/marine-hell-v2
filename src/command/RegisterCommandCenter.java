@@ -11,10 +11,10 @@ public class RegisterCommandCenter implements BaseCommand {
 	
 	public RegisterCommandCenter(Unit commandCenter, List<Unit> allUnits) {
 		Unit bestMineral = null;
-		double bestDistance = Double.MAX_VALUE;
+		int bestDistance = 0;
 		for (Unit unit : allUnits) {
 			if (unit.getType().isMineralField()) {
-				double distance = BWTA.getGroundDistance(commandCenter.getTilePosition(), unit.getTilePosition());
+				int distance = commandCenter.getDistance(unit);
 				if (bestMineral == null || distance < bestDistance) {
 					bestMineral = unit;
 					bestDistance = distance;

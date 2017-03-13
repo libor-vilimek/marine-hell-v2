@@ -27,7 +27,6 @@ public class GameInternal {
 			}
 		}
 
-		System.out.println(regCommandCenter);
 		if (regCommandCenter != null) {
 			desires.add(new WorkerMining(regCommandCenter.getCommandCenter()));
 			buildDesires.add(new WorkerBuild(regCommandCenter.getCommandCenter()));
@@ -85,6 +84,10 @@ public class GameInternal {
 	public void writeStrategies(Game game){
 		for (Map.Entry<Unit, Desire> entry : unitsInDesires.entrySet()){
 			game.drawTextMap(entry.getKey().getPosition(), entry.getValue().infoText());
+		}
+		
+		for (Desire desire : desires){
+			desire.specialStrategies(game);
 		}
 	}
 }

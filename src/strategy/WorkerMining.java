@@ -3,6 +3,7 @@ package strategy;
 import java.util.ArrayList;
 import java.util.List;
 
+import bwapi.Game;
 import bwapi.Unit;
 import bwta.BWTA;
 import units.CommandCenter;
@@ -54,5 +55,10 @@ public class WorkerMining implements Desire {
 	@Override
 	public String infoText() {
 		return "Gathering resources";
+	}
+
+	@Override
+	public void specialStrategies(Game game) {
+		this.commandCenter.writeStrategies(game);
 	}
 }
