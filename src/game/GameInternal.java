@@ -34,8 +34,11 @@ public class GameInternal {
 
 	private ReservedResources actualReservedResources() {
 		ReservedResources actualRes = new ReservedResources();
-		for (ReservedResources resource : toBuild.values()) {
-			actualRes.add(resource);
+		for (Map.Entry<BuildDesire, ReservedResources> resource : toBuild.entrySet()) {
+			if (resource.getKey().getBuildState() == BuildState.NotStarted
+					|| resource.getKey().getBuildState() == BuildState.InProgress) {
+				actualRes.add(resource.getValue());
+			}
 		}
 
 		return actualRes;
@@ -59,14 +62,17 @@ public class GameInternal {
 	}
 
 	public void updateDesires(List<Unit> units) {
-		for (Unit unit : units) {
+		for (Unit unit : units) {			
+			if (!unit.isCompleted()){
+				continue;
+			}
 			Desire maxDesire = null;
 			int maxDesireValue = 0;
 
 			for (Desire desire : desires) {
 				Desire currentDesire = unitsInDesires.get(unit);
 				int desireValue = desire.desire(unit);
-				if (currentDesire != null){
+				if (currentDesire != null) {
 					desireValue -= currentDesire.graspStrength(unit);
 				}
 				if (maxDesire == null || maxDesireValue < desireValue) {
@@ -94,9 +100,10 @@ public class GameInternal {
 
 		List<ResourcesWithDesire> resources = new ArrayList<>();
 		for (BuildDesire desire : buildDesires.keySet()) {
+			
 			ReservedResources newRes = desire.desire(game);
-			if (newRes != null) {
-				resources.add(new ResourcesWithDesire(desire.desire(game), desire));
+			if (newRes != null && toBuild.get(desire) == null) {
+				resources.add(new ResourcesWithDesire(newRes, desire));
 			}
 		}
 
@@ -162,6 +169,16 @@ public class GameInternal {
 	}
 
 	public void writeStrategies(Game game) {
+		ReservedResources resources = actualReservedResources();
+		if (game.self().minerals() >= 100){
+			game.setLocalSpeed(30);
+		}
+		
+		game.drawTextScreen(570, 20, "Time: " + game.elapsedTime());
+
+		game.drawTextScreen(10, 10, "Reserved Resources - Minerals: " + resources.getMinerals() + " Gas: "
+				+ resources.getGas() + " Supply: " + resources.getSupply());
+
 		for (Map.Entry<Unit, Desire> entry : unitsInDesires.entrySet()) {
 			game.drawTextMap(entry.getKey().getPosition(), entry.getValue().infoText());
 		}

@@ -28,7 +28,7 @@ public class MarineHell extends DefaultBWListener {
 	public void onStart() {
 		game = mirror.getGame();
 		self = game.self();
-		game.setLocalSpeed(1);
+		game.setLocalSpeed(0);
 
 		// Use BWTA to analyze map
 		// This may take a few minutes if the map is processed first time!
@@ -50,8 +50,6 @@ public class MarineHell extends DefaultBWListener {
 			gameInternal.updateBuildDesires(game);
 			gameInternal.executeBuildDesires();
 
-			// game.setTextSize(10);
-			game.drawTextScreen(10, 10, "Playing as " + self.getName() + " - " + self.getRace());
 
 			for (BaseLocation b : BWTA.getBaseLocations()) {
 				Color color;

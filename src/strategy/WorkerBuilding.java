@@ -57,6 +57,10 @@ public class WorkerBuilding implements Desire {
 				TilePosition tilePosition = getBuildTile(unit, buildDesire.getUnitType(), unit.getTilePosition(), game);
 				unit.build(buildDesire.getUnitType(), tilePosition);
 			}
+			
+			if (unit.isConstructing() && unit.canHaltConstruction()){
+				buildDesire.setBuildState(BuildState.InConstruction);
+			}
 		}
 	}
 
