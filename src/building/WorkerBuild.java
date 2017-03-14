@@ -27,7 +27,16 @@ public class WorkerBuild implements BuildDesire {
 		if (buildState == BuildState.NotStarted) {
 			this.commandCenter.getUnit().build(UnitType.Terran_SCV);
 		}
-		buildState = BuildState.Finished;
+
+		if (this.commandCenter.getUnit().getTrainingQueue().isEmpty()) {
+			if (buildState != BuildState.NotStarted) {
+				buildState = BuildState.Finished;
+			}
+		} else {
+			if (buildState == BuildState.NotStarted){
+				this.buildState = BuildState.InConstruction;
+			}
+		}
 	}
 
 	@Override
@@ -42,7 +51,8 @@ public class WorkerBuild implements BuildDesire {
 
 	@Override
 	public void specialStrategies(Game game) {
-		game.drawTextMap(this.commandCenter.getUnit().getPosition().getX(), this.commandCenter.getUnit().getPosition().getY()+10, "Build worker: " + this.buildState);
+		game.drawTextMap(this.commandCenter.getUnit().getPosition().getX(),
+				this.commandCenter.getUnit().getPosition().getY() + 10, "Build worker: " + this.buildState);
 	}
 
 	@Override

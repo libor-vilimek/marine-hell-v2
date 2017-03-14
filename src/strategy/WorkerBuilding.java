@@ -18,6 +18,7 @@ public class WorkerBuilding implements Desire {
 	Map<BuildDesire, Spawner> buildDesires;
 	List<Unit> units = new ArrayList<>();
 	Map<Unit, BuildDesire> unitsHasBuildDesires = new HashMap<>();
+	Map<Unit, Unit> unitsHasBuildingsConstructed = new HashMap<>();
 
 	public WorkerBuilding(Map<BuildDesire, Spawner> buildDesires) {
 		this.buildDesires = buildDesires;
@@ -49,18 +50,34 @@ public class WorkerBuilding implements Desire {
 
 	@Override
 	public void execute(Game game) {
+		List<Unit> toRemove = new ArrayList<>();
 		for (Map.Entry<Unit, BuildDesire> entry : unitsHasBuildDesires.entrySet()) {
 			Unit unit = entry.getKey();
 			BuildDesire buildDesire = entry.getValue();
 
-			if (unit.isGatheringMinerals() || unit.isIdle()) {
+			if ( (unit.isGatheringMinerals() || unit.isIdle()) && buildDesire.getBuildState() == BuildState.InProgress) {
 				TilePosition tilePosition = getBuildTile(unit, buildDesire.getUnitType(), unit.getTilePosition(), game);
 				unit.build(buildDesire.getUnitType(), tilePosition);
 			}
 			
 			if (unit.isConstructing() && unit.canHaltConstruction()){
 				buildDesire.setBuildState(BuildState.InConstruction);
+				Unit buildUnit = unit.getBuildUnit();
+				if (buildUnit != null){
+					unitsHasBuildingsConstructed.put(unit, buildUnit);
+				}
 			}
+			
+			Unit buildUnit = unitsHasBuildingsConstructed.get(unit);
+			if (buildUnit != null && buildUnit.isCompleted() && buildDesire.getBuildState() == BuildState.InConstruction){
+				buildDesire.setBuildState(BuildState.Finished);
+				toRemove.add(unit);
+			}
+			
+		}
+		
+		for (Unit unit : toRemove){
+			this.removeUnit(unit);
 		}
 	}
 
@@ -72,6 +89,7 @@ public class WorkerBuilding implements Desire {
 		if (buildState != null) {
 			buildState.setBuildState(BuildState.Finished);
 		}
+		this.unitsHasBuildingsConstructed.remove(unit);
 	}
 
 	@Override
@@ -84,7 +102,7 @@ public class WorkerBuilding implements Desire {
 		int i = 0;
 		game.drawTextScreen(10, 30, "Build Desires:");
 		for (BuildDesire buildDesire : buildDesires.keySet()) {
-			game.drawTextScreen(10, 40 + i * 10, buildDesire.infoText());
+			game.drawTextScreen(10, 40 + i * 10, buildDesire.infoText() + " - " + buildDesire.getBuildState());
 			i++;
 		}
 	}
@@ -102,6 +120,9 @@ public class WorkerBuilding implements Desire {
 
 	@Override
 	public int graspStrength(Unit unit) {
+		if (!units.contains(unit)){
+			return 0;
+		}
 		return 10000;
 	}
 

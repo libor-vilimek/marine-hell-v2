@@ -171,7 +171,7 @@ public class GameInternal {
 	public void writeStrategies(Game game) {
 		ReservedResources resources = actualReservedResources();
 		if (game.self().minerals() >= 100){
-			game.setLocalSpeed(60);
+			game.setLocalSpeed(20);
 		}
 		
 		game.drawTextScreen(570, 20, "Time: " + game.elapsedTime());
