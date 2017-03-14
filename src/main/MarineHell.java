@@ -34,35 +34,45 @@ public class MarineHell extends DefaultBWListener {
 		// This may take a few minutes if the map is processed first time!
 		BWTA.readMap();
 		BWTA.analyze();
-		
+
 		gameInternal = new GameInternal(game);
 	}
 
 	@Override
 	public void onFrame() {
-		gameInternal.updateDesires(self.getUnits());
-		gameInternal.executeDesires();
-		gameInternal.writeStrategies(game);
-		
-		// game.setTextSize(10);
-		game.drawTextScreen(10, 10, "Playing as " + self.getName() + " - " + self.getRace());
+		try {
+			gameInternal.updateDesires(self.getUnits());
+			gameInternal.executeDesires(game);
+			gameInternal.writeStrategies(game);
 
-		for (BaseLocation b : BWTA.getBaseLocations()) {
-			Color color;
-			if (b.isStartLocation()) {
-				color = Color.Green;
-			} else {
-				color = Color.Yellow;
+			gameInternal.updateSpawners(game);
+			gameInternal.removeBuildDesires();
+			gameInternal.updateBuildDesires(game);
+			gameInternal.executeBuildDesires();
+
+			// game.setTextSize(10);
+			game.drawTextScreen(10, 10, "Playing as " + self.getName() + " - " + self.getRace());
+
+			for (BaseLocation b : BWTA.getBaseLocations()) {
+				Color color;
+				if (b.isStartLocation()) {
+					color = Color.Green;
+				} else {
+					color = Color.Yellow;
+				}
+
+				game.drawCircleMap(b.getX(), b.getY(), 100, color);
 			}
 
-			game.drawCircleMap(b.getX(), b.getY(), 100, color);
-		}
-
-		// iterate through my units
-		for (Unit myUnit : self.getUnits()) {
-			if (myUnit.getOrderTargetPosition().getX() != 0 && myUnit.getOrderTargetPosition().getY() != 0) {
-				game.drawLineMap(myUnit.getPosition(), myUnit.getOrderTargetPosition(), Color.Red);
+			// iterate through my units
+			for (Unit myUnit : self.getUnits()) {
+				if (myUnit.getOrderTargetPosition().getX() != 0 && myUnit.getOrderTargetPosition().getY() != 0) {
+					game.drawLineMap(myUnit.getPosition(), myUnit.getOrderTargetPosition(), Color.Red);
+				}
 			}
+		} catch (Exception err) {
+			System.out.println(err.getMessage());
+			err.printStackTrace();
 		}
 	}
 

@@ -23,7 +23,7 @@ public class WorkerMining implements Desire {
 			return 0;
 		}
 
-		if (unit.getType().isWorker() && unit.isIdle()) {
+		if (unit.getType().isWorker() && unit.isIdle() && !commandCenter.getWorkers().contains(unit)) {
 			double distance = BWTA.getGroundDistance(unit.getTilePosition(),
 					commandCenter.getUnit().getTilePosition());
 			return 200;
@@ -33,12 +33,16 @@ public class WorkerMining implements Desire {
 	}
 
 	@Override
-	public void addUnit(Unit unit) {
+	public boolean addUnit(Unit unit) {
+		if (commandCenter.getWorkers().contains(unit)){
+			return false;
+		}
 		commandCenter.addNewWorker(unit);
+		return true;
 	}
 
 	@Override
-	public void execute() {
+	public void execute(Game game) {
 		List<Unit> workers = commandCenter.getWorkers();
 		for (Unit worker : workers){
 			if (!worker.isGatheringMinerals()){
@@ -60,5 +64,10 @@ public class WorkerMining implements Desire {
 	@Override
 	public void specialStrategies(Game game) {
 		this.commandCenter.writeStrategies(game);
+	}
+
+	@Override
+	public int graspStrength(Unit unit) {
+		return 10;
 	}
 }

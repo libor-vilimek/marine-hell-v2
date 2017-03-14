@@ -50,7 +50,7 @@ public class ReservedResources {
 	}
 	
 	public boolean canReserve(ReservedResources newResources, ReservedResources maxResources){
-		if (this.minerals + newResources.minerals > maxResources.minerals){
+		if (this.minerals + newResources.getMinerals() > maxResources.getMinerals()){
 			return false;
 		}
 		if (this.gas + newResources.gas > maxResources.gas){
