@@ -20,7 +20,8 @@ public class CommandCenterSpawner implements Spawner {
 		}
 		
 		if (commandCenter.getUnit().getTrainingQueue().isEmpty() && commandCenter.getWorkers().size() < 20){
-			return new WorkerBuild(this.commandCenter);
+			buildWorker = new WorkerBuild(this.commandCenter);
+			return buildWorker;
 		}
 		
 		return null;

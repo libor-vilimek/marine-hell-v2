@@ -155,7 +155,7 @@ public class GameInternal {
 	}
 
 	public void executeBuildDesires() {
-		for (BuildDesire desire : this.buildDesires.keySet()) {
+		for (BuildDesire desire : this.toBuild.keySet()) {
 			desire.execute();
 		}
 	}
@@ -171,7 +171,7 @@ public class GameInternal {
 	public void writeStrategies(Game game) {
 		ReservedResources resources = actualReservedResources();
 		if (game.self().minerals() >= 100){
-			game.setLocalSpeed(30);
+			game.setLocalSpeed(60);
 		}
 		
 		game.drawTextScreen(570, 20, "Time: " + game.elapsedTime());
