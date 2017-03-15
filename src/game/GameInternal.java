@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import building.BarrackBuilt;
 import building.BuildDesire;
 import building.BuildState;
 import building.WorkerBuild;
@@ -18,6 +19,7 @@ import command.RegisterCommandCenter;
 import models.ReservedResources;
 import models.ResourcesWithDesire;
 import spawners.BarracksSpawner;
+import spawners.BarracksUnitSpawner;
 import spawners.CommandCenterSpawner;
 import spawners.Spawner;
 import spawners.SupplyLimitSpawner;
@@ -25,6 +27,7 @@ import strategy.Desire;
 import strategy.Information;
 import strategy.WorkerBuilding;
 import strategy.WorkerMining;
+import units.Barracks;
 
 public class GameInternal {
 	Game game;
@@ -64,6 +67,8 @@ public class GameInternal {
 			spawners.add(new BarracksSpawner());
 		}
 	}
+	
+	
 
 	public void updateDesires(List<Unit> units) {
 		for (Unit unit : units) {			
@@ -169,6 +174,12 @@ public class GameInternal {
 
 		if (desire != null) {
 			desire.removeUnit(unit);
+		}
+	}
+	
+	public void unitCreated(Unit unit){
+		if (unit.getType() == UnitType.Terran_Barracks){
+			spawners.add(new BarracksUnitSpawner(new Barracks(unit)));
 		}
 	}
 

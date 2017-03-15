@@ -9,7 +9,7 @@ private BuildState buildState = BuildState.NotStarted;
 	
 	@Override
 	public ReservedResources desire(Game game) {
-		if (game.self().minerals() >= 100){
+		if (game.self().minerals() >= 150){
 			return new ReservedResources(150, 0, 0, 1000);
 		}
 		

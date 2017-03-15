@@ -21,7 +21,7 @@ public class MarineHell extends DefaultBWListener {
 
 	@Override
 	public void onUnitCreate(Unit unit) {
-		// System.out.println("New unit discovered " + unit.getType());
+		gameInternal.unitCreated(unit);
 	}
 	
 	@Override

@@ -13,9 +13,7 @@ public class BarracksSpawner implements Spawner {
 
 	@Override
 	public BuildDesire buildDesire(Game game) {
-		boolean add = false;
-		
-		if (game.self().minerals() >= 150 && game.self().supplyTotal() >= 20 && buildDesires.isEmpty()){
+		if (game.self().supplyTotal() > 10 && game.self().minerals() >= 150 && buildDesires.isEmpty()){
 			BuildDesire desire = new BarrackBuilt();
 			buildDesires.add(desire);
 			return desire;
