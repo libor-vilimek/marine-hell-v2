@@ -17,6 +17,7 @@ import bwapi.UnitType;
 import command.RegisterCommandCenter;
 import models.ReservedResources;
 import models.ResourcesWithDesire;
+import spawners.BarracksSpawner;
 import spawners.CommandCenterSpawner;
 import spawners.Spawner;
 import spawners.SupplyLimitSpawner;
@@ -60,6 +61,7 @@ public class GameInternal {
 			desires.add(new Information(game));
 			spawners.add(new CommandCenterSpawner(regCommandCenter.getCommandCenter()));
 			spawners.add(new SupplyLimitSpawner());
+			spawners.add(new BarracksSpawner());
 		}
 	}
 

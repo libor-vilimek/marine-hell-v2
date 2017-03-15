@@ -3,15 +3,14 @@ package building;
 import bwapi.Game;
 import bwapi.UnitType;
 import models.ReservedResources;
-import strategy.WorkerBuilding;
 
-public class SupplyDepotBuild implements BuildDesire {	
-	private BuildState buildState = BuildState.NotStarted;
+public class BarrackBuilt implements BuildDesire {
+private BuildState buildState = BuildState.NotStarted;
 	
 	@Override
 	public ReservedResources desire(Game game) {
 		if (game.self().minerals() >= 100){
-			return new ReservedResources(100, 0, 0, 5000);
+			return new ReservedResources(150, 0, 0, 1000);
 		}
 		
 		return null;
@@ -30,7 +29,7 @@ public class SupplyDepotBuild implements BuildDesire {
 
 	@Override
 	public String infoText() {
-		return "Supply depot";
+		return "Barracks";
 	}
 
 	@Override
@@ -45,12 +44,11 @@ public class SupplyDepotBuild implements BuildDesire {
 
 	@Override
 	public UnitType getUnitType() {
-		return UnitType.Terran_Supply_Depot;
+		return UnitType.Terran_Barracks;
 	}
 
 	@Override
 	public void setBuildState(BuildState buildState) {
 		this.buildState = buildState;
 	}
-
 }

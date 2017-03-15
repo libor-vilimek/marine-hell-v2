@@ -23,6 +23,11 @@ public class MarineHell extends DefaultBWListener {
 	public void onUnitCreate(Unit unit) {
 		// System.out.println("New unit discovered " + unit.getType());
 	}
+	
+	@Override
+	public void onUnitDestroy(Unit unit) {
+		gameInternal.unitDied(unit);
+	}
 
 	@Override
 	public void onStart() {
