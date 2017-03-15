@@ -21,6 +21,7 @@ import spawners.CommandCenterSpawner;
 import spawners.Spawner;
 import spawners.SupplyLimitSpawner;
 import strategy.Desire;
+import strategy.Information;
 import strategy.WorkerBuilding;
 import strategy.WorkerMining;
 
@@ -56,6 +57,7 @@ public class GameInternal {
 		if (regCommandCenter != null) {
 			desires.add(new WorkerMining(regCommandCenter.getCommandCenter()));
 			desires.add(new WorkerBuilding(this.buildDesires));
+			desires.add(new Information(game));
 			spawners.add(new CommandCenterSpawner(regCommandCenter.getCommandCenter()));
 			spawners.add(new SupplyLimitSpawner());
 		}

@@ -72,8 +72,7 @@ public class WorkerBuilding implements Desire {
 			if (buildUnit != null && buildUnit.isCompleted() && buildDesire.getBuildState() == BuildState.InConstruction){
 				buildDesire.setBuildState(BuildState.Finished);
 				toRemove.add(unit);
-			}
-			
+			}			
 		}
 		
 		for (Unit unit : toRemove){
