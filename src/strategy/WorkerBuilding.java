@@ -12,6 +12,7 @@ import bwapi.Game;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
+import game.GlobalInformation;
 import spawners.Spawner;
 
 public class WorkerBuilding implements Desire {
@@ -27,8 +28,9 @@ public class WorkerBuilding implements Desire {
 	@Override
 	public int desire(Unit unit) {
 		BuildDesire buildDesire = this.notStartedDesire();
+		double distance = unit.getDistance(GlobalInformation.getMyStartLocation().getPosition());
 		if (unit.getType().isWorker() && buildDesire != null && !units.contains(unit)) {
-			return 5000;
+			return (int) (5000 - distance);
 		}
 
 		return 0;
@@ -55,27 +57,40 @@ public class WorkerBuilding implements Desire {
 			Unit unit = entry.getKey();
 			BuildDesire buildDesire = entry.getValue();
 
-			if ( (unit.isGatheringMinerals() || unit.isIdle()) && buildDesire.getBuildState() == BuildState.InProgress) {
-				TilePosition tilePosition = getBuildTile(unit, buildDesire.getUnitType(), unit.getTilePosition(), game);
-				unit.build(buildDesire.getUnitType(), tilePosition);
+			if ((unit.isGatheringMinerals() || unit.isIdle()) && buildDesire.getBuildState() == BuildState.InProgress) {
+				TilePosition tilePosition;
+				if (buildDesire.getUnitType() == UnitType.Terran_Bunker) {
+					tilePosition = getBuildTile(unit, buildDesire.getUnitType(),
+							GlobalInformation.closestChokePoint.getCenter().toTilePosition(), game);
+				} else {
+					tilePosition = getBuildTile(unit, buildDesire.getUnitType(), unit.getTilePosition(), game);
+				}
+
+				System.out.println(unit.getDistance(tilePosition.toPosition()));
+				if (unit.getDistance(tilePosition.toPosition()) < 200) {
+					unit.build(buildDesire.getUnitType(), tilePosition);
+				} else {
+					unit.move(tilePosition.toPosition());
+				}
 			}
-			
-			if (unit.isConstructing() && unit.canHaltConstruction()){
+
+			if (unit.isConstructing() && unit.canHaltConstruction()) {
 				buildDesire.setBuildState(BuildState.InConstruction);
 				Unit buildUnit = unit.getBuildUnit();
-				if (buildUnit != null){
+				if (buildUnit != null) {
 					unitsHasBuildingsConstructed.put(unit, buildUnit);
 				}
 			}
-			
+
 			Unit buildUnit = unitsHasBuildingsConstructed.get(unit);
-			if (buildUnit != null && buildUnit.isCompleted() && buildDesire.getBuildState() == BuildState.InConstruction){
+			if (buildUnit != null && buildUnit.isCompleted()
+					&& buildDesire.getBuildState() == BuildState.InConstruction) {
 				buildDesire.setBuildState(BuildState.Finished);
 				toRemove.add(unit);
-			}			
+			}
 		}
-		
-		for (Unit unit : toRemove){
+
+		for (Unit unit : toRemove) {
 			this.removeUnit(unit);
 		}
 	}
@@ -119,7 +134,7 @@ public class WorkerBuilding implements Desire {
 
 	@Override
 	public int graspStrength(Unit unit) {
-		if (!units.contains(unit)){
+		if (!units.contains(unit)) {
 			return 0;
 		}
 		return 10000;

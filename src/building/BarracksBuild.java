@@ -47,7 +47,7 @@ public class BarracksBuild implements BuildDesire {
 
 	@Override
 	public String infoText() {
-		return "Build worker";
+		return "Build marine";
 	}
 
 	@Override

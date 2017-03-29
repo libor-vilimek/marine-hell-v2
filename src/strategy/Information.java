@@ -7,6 +7,7 @@ import bwapi.Game;
 import bwapi.Unit;
 import bwta.BWTA;
 import bwta.BaseLocation;
+import game.GlobalInformation;
 
 public class Information implements Desire {
 	private List<Unit> units = new ArrayList<Unit>();
@@ -21,7 +22,11 @@ public class Information implements Desire {
 
 	@Override
 	public int desire(Unit unit) {
-		if (unit.getType().isWorker() && game.self().supplyUsed() > 7 && units.isEmpty()) {
+		if (!GlobalInformation.enemyBuildings.isEmpty()){
+			return 0;
+		}
+		
+		if (unit.getType().isWorker() && game.self().supplyUsed() > 14 && units.isEmpty()) {
 			return 5000;
 		}
 
@@ -69,7 +74,10 @@ public class Information implements Desire {
 
 	@Override
 	public int graspStrength(Unit unit) {
-		return 10000;
+		if (GlobalInformation.enemyBuildings.isEmpty()){
+			return 10000;
+		}
+		return 0;
 	}
 
 }

@@ -11,7 +11,9 @@ import building.BarrackBuilt;
 import building.BuildDesire;
 import building.BuildState;
 import building.WorkerBuild;
+import bwapi.Color;
 import bwapi.Game;
+import bwapi.Position;
 import bwapi.TilePosition;
 import bwapi.Unit;
 import bwapi.UnitType;
@@ -20,9 +22,11 @@ import models.ReservedResources;
 import models.ResourcesWithDesire;
 import spawners.BarracksSpawner;
 import spawners.BarracksUnitSpawner;
+import spawners.BunkerSpawner;
 import spawners.CommandCenterSpawner;
 import spawners.Spawner;
 import spawners.SupplyLimitSpawner;
+import strategy.BuildAndAttack;
 import strategy.Desire;
 import strategy.Information;
 import strategy.WorkerBuilding;
@@ -51,6 +55,8 @@ public class GameInternal {
 
 	public GameInternal(Game game) {
 		this.game = game;
+		GlobalInformation.initialize(game);
+		
 		RegisterCommandCenter regCommandCenter = null;
 		for (Unit unit : game.self().getUnits()) {
 			if (unit.getType() == UnitType.Terran_Command_Center) {
@@ -62,19 +68,20 @@ public class GameInternal {
 			desires.add(new WorkerMining(regCommandCenter.getCommandCenter()));
 			desires.add(new WorkerBuilding(this.buildDesires));
 			desires.add(new Information(game));
+			desires.add(new BuildAndAttack(game));
 			spawners.add(new CommandCenterSpawner(regCommandCenter.getCommandCenter()));
 			spawners.add(new SupplyLimitSpawner());
 			spawners.add(new BarracksSpawner());
+			spawners.add(new BunkerSpawner());
 		}
 	}
-	
-	
 
 	public void updateDesires(List<Unit> units) {
-		for (Unit unit : units) {			
-			if (!unit.isCompleted()){
+		for (Unit unit : units) {
+			if (!unit.isCompleted()) {
 				continue;
 			}
+			
 			Desire maxDesire = null;
 			int maxDesireValue = 0;
 
@@ -109,7 +116,7 @@ public class GameInternal {
 
 		List<ResourcesWithDesire> resources = new ArrayList<>();
 		for (BuildDesire desire : buildDesires.keySet()) {
-			
+
 			ReservedResources newRes = desire.desire(game);
 			if (newRes != null && toBuild.get(desire) == null) {
 				resources.add(new ResourcesWithDesire(newRes, desire));
@@ -169,26 +176,39 @@ public class GameInternal {
 		}
 	}
 
+	public void unitDiscovered(Unit unit) {
+		if (!unit.getPlayer().equals(game.self()) && unit.getType().isBuilding() && !unit.getType().isNeutral()) {
+			GlobalInformation.enemyBuildings.put(unit, unit.getPosition());
+		}
+		
+		GlobalInformation.unitDiscovered(unit);
+	}
+
 	public void unitDied(Unit unit) {
 		Desire desire = unitsInDesires.get(unit);
 
 		if (desire != null) {
 			desire.removeUnit(unit);
 		}
+		
+		GlobalInformation.enemyBuildings.remove(unit);
+		GlobalInformation.unitDied(unit);
 	}
-	
-	public void unitCreated(Unit unit){
-		if (unit.getType() == UnitType.Terran_Barracks){
+
+	public void unitCreated(Unit unit) {
+		if (unit.getType() == UnitType.Terran_Barracks) {
 			spawners.add(new BarracksUnitSpawner(new Barracks(unit)));
 		}
 	}
 
 	public void writeStrategies(Game game) {
 		ReservedResources resources = actualReservedResources();
-		if (game.self().minerals() >= 100){
+		if (!GlobalInformation.enemyBuildings.isEmpty()) {
 			game.setLocalSpeed(20);
+		} else {
+			game.setLocalSpeed(0);
 		}
-		
+
 		game.drawTextScreen(570, 20, "Time: " + game.elapsedTime());
 
 		game.drawTextScreen(10, 10, "Reserved Resources - Minerals: " + resources.getMinerals() + " Gas: "
@@ -209,6 +229,19 @@ public class GameInternal {
 		for (Spawner spawner : spawners) {
 			spawner.specialStrategies(game);
 		}
+
+		for (Position position : GlobalInformation.enemyBuildings.values()) {
+			game.drawCircleMap(position, 50, Color.Red);
+			if (game.isVisible(position.toTilePosition())){
+				game.drawTextMap(position, "Is visible");
+			} else {
+				game.drawTextMap(position, "Not visible");
+			}
+		}
+		
+		
+		
+		game.drawTextMap(GlobalInformation.getExp().getPosition(), "First expansion");
 	}
 
 }

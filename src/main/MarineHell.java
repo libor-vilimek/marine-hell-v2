@@ -3,7 +3,9 @@ package main;
 import bwapi.*;
 import bwta.BWTA;
 import bwta.BaseLocation;
+import bwta.Chokepoint;
 import game.GameInternal;
+import game.GlobalInformation;
 
 public class MarineHell extends DefaultBWListener {
 
@@ -29,6 +31,11 @@ public class MarineHell extends DefaultBWListener {
 		gameInternal.unitDied(unit);
 	}
 
+	@Override
+	public void onUnitDiscover(Unit unit) {
+		gameInternal.unitDiscovered(unit);
+	}
+	
 	@Override
 	public void onStart() {
 		game = mirror.getGame();
@@ -65,6 +72,10 @@ public class MarineHell extends DefaultBWListener {
 				}
 
 				game.drawCircleMap(b.getX(), b.getY(), 100, color);
+			}
+			
+			for (Chokepoint chokePoint: BWTA.getChokepoints()){
+				game.drawTextMap(chokePoint.getCenter(), "Chokepoint");
 			}
 
 			// iterate through my units
